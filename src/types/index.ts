@@ -43,10 +43,63 @@ export interface Palpite {
   updatedAt?: string;
 }
 
+export interface PalpiteStats extends Palpite {
+  total_likes: number;
+  total_dislikes: number;
+  total_comentarios: number;
+  user_reaction: ReactionType | null;
+  autor_nome?: string;
+  autor_avatar?: string;
+}
+
 export interface CreatePalpiteData {
   titulo?: string;
   linkAposta?: string;
   imagem: File;
+}
+
+// Reaction Types
+export type ReactionType = 'like' | 'dislike';
+
+export interface Reaction {
+  id: number;
+  user_id: number;
+  tipo: ReactionType;
+  created_at: string;
+}
+
+export interface ReactionResponse {
+  action: 'added' | 'removed' | 'changed';
+  total_likes: number;
+  total_dislikes: number;
+}
+
+export interface ReactionRequest {
+  tipo: ReactionType;
+}
+
+// Comentario Types
+export interface Comentario {
+  id: number;
+  palpite_id: number;
+  user_id: number;
+  texto: string;
+  created_at: string;
+  updated_at: string;
+  total_likes?: number;
+  total_dislikes?: number;
+  autor_nome?: string;
+  autor_avatar?: string;
+  user_reaction?: ReactionType | null;
+}
+
+export interface CreateComentarioData {
+  palpite_id: number;
+  texto: string;
+}
+
+export interface UpdateComentarioData {
+  texto: string;
 }
 
 // API Response Types

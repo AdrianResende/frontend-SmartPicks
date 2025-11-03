@@ -543,6 +543,95 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
+  const reactToPalpite = async (palpiteId: number, tipo: 'like' | 'dislike') => {
+    try {
+      const response = await api.post(`/palpites/${palpiteId}/react`, {
+        tipo
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao reagir ao palpite:', error);
+      throw error;
+    }
+  };
+
+  const reactToComentario = async (comentarioId: number, tipo: 'like' | 'dislike') => {
+    try {
+      const response = await api.post(`/comentarios/${comentarioId}/react`, {
+        tipo
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao reagir ao comentário:', error);
+      throw error;
+    }
+  };
+
+  const getPalpiteStats = async (palpiteId: number) => {
+    try {
+      const response = await api.get(`/palpites/${palpiteId}/stats`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar estatísticas do palpite:', error);
+      throw error;
+    }
+  };
+
+  const getPalpitesWithStats = async () => {
+    try {
+      const response = await api.get('/palpites/stats');
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar palpites com estatísticas:', error);
+      throw error;
+    }
+  };
+
+  const getComentarios = async (palpiteId: number) => {
+    try {
+      const response = await api.get(`/palpites/${palpiteId}/comentarios`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar comentários:', error);
+      throw error;
+    }
+  };
+
+  const createComentario = async (palpiteId: number, texto: string) => {
+    try {
+      const response = await api.post('/comentarios', {
+        palpite_id: palpiteId,
+        texto
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao criar comentário:', error);
+      throw error;
+    }
+  };
+
+  const updateComentario = async (comentarioId: number, texto: string) => {
+    try {
+      const response = await api.put(`/comentarios/${comentarioId}`, {
+        texto
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao atualizar comentário:', error);
+      throw error;
+    }
+  };
+
+  const deleteComentario = async (comentarioId: number) => {
+    try {
+      await api.delete(`/comentarios/${comentarioId}`);
+      return true;
+    } catch (error) {
+      console.error('Erro ao deletar comentário:', error);
+      throw error;
+    }
+  };
+
   const removeAvatar = async (): Promise<boolean> => {
     try {
       isLoading.value = true;
@@ -600,5 +689,13 @@ export const useAuthStore = defineStore('auth', () => {
     uploadAvatar,
     removeAvatar,
     getPalpites,
+    reactToPalpite,
+    reactToComentario,
+    getPalpiteStats,
+    getPalpitesWithStats,
+    getComentarios,
+    createComentario,
+    updateComentario,
+    deleteComentario,
   };
 });
