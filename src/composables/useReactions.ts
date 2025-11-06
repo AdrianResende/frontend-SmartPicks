@@ -17,26 +17,11 @@ export function useReactions() {
       const response = await authStore.reactToPalpite(palpiteId, tipo);
 
       if (response.action === 'added') {
-        $q.notify({
-          type: 'positive',
-          message: tipo === 'like' ? '👍 Curtiu!' : '👎 Não curtiu!',
-          position: 'top',
-          timeout: 1000
-        });
+        console.log('Reação adicionada com sucesso');
       } else if (response.action === 'removed') {
-        $q.notify({
-          type: 'info',
-          message: 'Reação removida',
-          position: 'top',
-          timeout: 1000
-        });
+        console.log('Reação removida com sucesso');
       } else if (response.action === 'changed') {
-        $q.notify({
-          type: 'info',
-          message: tipo === 'like' ? '👍 Mudou para curtir!' : '👎 Mudou para não curtir!',
-          position: 'top',
-          timeout: 1000
-        });
+        console.log('Reação alterada com sucesso');
       }
 
       return response;

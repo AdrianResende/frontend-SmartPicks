@@ -495,7 +495,6 @@ export const useAuthStore = defineStore('auth', () => {
     } catch (error) {
       console.error('Erro completo no upload de avatar:', error);
 
-      // Type guard para erro de axios
       const axiosError = error as {
         response?: {
           status?: number;
@@ -507,7 +506,6 @@ export const useAuthStore = defineStore('auth', () => {
         message?: string
       };
 
-      // Log detalhado do erro
       if (axiosError.response) {
         console.error('Erro de resposta da API:', {
           status: axiosError.response.status,
@@ -579,10 +577,12 @@ export const useAuthStore = defineStore('auth', () => {
 
   const getPalpitesWithStats = async () => {
     try {
+      console.log('🔄 Chamando endpoint: /palpites/stats');
       const response = await api.get('/palpites/stats');
+      console.log('📦 Resposta do backend:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Erro ao buscar palpites com estatísticas:', error);
+      console.error('❌ Erro ao buscar palpites com estatísticas:', error);
       throw error;
     }
   };
