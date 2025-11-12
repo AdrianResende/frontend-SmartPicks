@@ -3,7 +3,11 @@
     <q-header v-if="authStore.isAuthenticated" elevated class="bg-white text-dark" height-hint="80">
       <div class="full-width q-ma-md">
         <q-toolbar class="q-px-md">
-          <div class="row items-center no-wrap">
+          <div
+            class="row items-center no-wrap"
+            style="min-width: 200px; cursor: pointer"
+            @click="dashboard"
+          >
             <img
               src="/icons/LogoSmart.png"
               alt="SmartPicks Logo"
@@ -84,8 +88,6 @@
               :loading="loggingOut"
               @click="onLogout"
             />
-
-            <!-- Logout Mobile -->
             <q-btn
               class="lt-sm"
               flat
@@ -176,6 +178,14 @@
   onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll);
   });
+
+  const dashboard = async () => {
+    try {
+      await router.push({ name: 'dashboard' });
+    } catch (err) {
+      // ignore navigation errors (e.g., navigating to the same route)
+    }
+  };
 
   const handlePalpiteCriado = () => {
     emit('palpite-criado');

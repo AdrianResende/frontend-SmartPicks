@@ -55,7 +55,7 @@ const routes: RouteRecordRaw[] = [
     beforeEnter: requireAuth,
     children: [
       {
-        path: '',
+        path: ':id?',
         name: 'perfil',
         component: () => import('src/pages/Perfil.vue'),
       },
