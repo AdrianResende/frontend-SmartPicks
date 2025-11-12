@@ -50,6 +50,18 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/perfil',
+    component: () => import('src/components/AppHeader.vue'),
+    beforeEnter: requireAuth,
+    children: [
+      {
+        path: '',
+        name: 'perfil',
+        component: () => import('src/pages/Perfil.vue'),
+      },
+    ],
+  },
+  {
     path: '/:catchAll(.*)*',
     name: 'error',
     component: () => import('pages/ErrorNotFound.vue'),

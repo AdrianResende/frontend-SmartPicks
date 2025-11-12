@@ -264,7 +264,7 @@ smartpicks-frontend/
 └── 📄 BACKEND-STANDARDS.md    # Padrões do backend
 ```
 
-## � Desenvolvimento
+## 🧪 Desenvolvimento
 
 ### Scripts Disponíveis
 
@@ -303,43 +303,43 @@ npm run type-check
 </template>
 
 <script setup lang="ts">
-// Interfaces locais
-interface Props {
-  titulo: string;
-  opcional?: boolean;
-}
+  // Interfaces locais
+  interface Props {
+    titulo: string;
+    opcional?: boolean;
+  }
 
-// Props tipadas
-const props = withDefaults(defineProps<Props>(), {
-  opcional: false,
-});
+  // Props tipadas
+  const props = withDefaults(defineProps<Props>(), {
+    opcional: false,
+  });
 
-// Emits tipados
-const emit = defineEmits<{
-  click: [id: string];
-  update: [value: any];
-}>();
+  // Emits tipados
+  const emit = defineEmits<{
+    click: [id: string];
+    update: [value: any];
+  }>();
 
-// Estado reativo
-const loading = ref(false);
+  // Estado reativo
+  const loading = ref(false);
 
-// Computadas
-const cssClasses = computed(() => ({
-  'is-loading': loading.value,
-}));
+  // Computadas
+  const cssClasses = computed(() => ({
+    'is-loading': loading.value,
+  }));
 
-// Métodos
-const handleClick = () => {
-  emit('click', 'exemplo');
-};
+  // Métodos
+  const handleClick = () => {
+    emit('click', 'exemplo');
+  };
 </script>
 
 <style lang="scss" scoped>
-.meu-componente {
-  // Use variáveis do design system
-  padding: $spacing-md;
-  border-radius: $border-radius-md;
-}
+  .meu-componente {
+    // Use variáveis do design system
+    padding: $spacing-md;
+    border-radius: $border-radius-md;
+  }
 </style>
 ```
 
@@ -357,29 +357,29 @@ const handleClick = () => {
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useNotifications } from 'src/composables/useNotifications';
+  import { ref, onMounted } from 'vue';
+  import { useNotifications } from 'src/composables/useNotifications';
 
-// Composables
-const { showSuccess, showError } = useNotifications();
+  // Composables
+  const { showSuccess, showError } = useNotifications();
 
-// Estado
-const dados = ref([]);
+  // Estado
+  const dados = ref([]);
 
-// Lifecycle
-onMounted(async () => {
-  await carregarDados();
-});
+  // Lifecycle
+  onMounted(async () => {
+    await carregarDados();
+  });
 
-// Actions
-const carregarDados = async () => {
-  try {
-    // lógica
-    showSuccess('Sucesso!');
-  } catch (error) {
-    showError('Erro!');
-  }
-};
+  // Actions
+  const carregarDados = async () => {
+    try {
+      // lógica
+      showSuccess('Sucesso!');
+    } catch (error) {
+      showError('Erro!');
+    }
+  };
 </script>
 ```
 
@@ -387,7 +387,7 @@ const carregarDados = async () => {
 
 Em `src/router/guards.ts`:
 
-```typescript
+````typescript
 export const meuGuard: NavigationGuard = async (to, from, next) => {
   // Sua lógica aqui
   if (condicao) {
@@ -396,13 +396,74 @@ export const meuGuard: NavigationGuard = async (to, from, next) => {
     next({ name: 'login' });
   }
 };
-```
+
+## 🎨 Tema e Paleta de Cores
+
+O projeto utiliza uma paleta personalizada definindo design tokens em `src/css/quasar.variables.scss` e `quasar.config.ts`.
+
+### Paleta Principal
+
+| Token | Hex | Uso |
+|-------|-----|-----|
+| `primary` | `#FF6B35` | CTAs, destaques principais |
+| `secondary` | `#4ECDC4` | Destaques secundários, links |
+| `accent` | `#E85A2A` | Estados hover, ênfase |
+
+### Status
+
+| Token | Hex | Uso |
+|-------|-----|-----|
+| `positive` | `#7FD858` | Sucesso, ganhos |
+| `warning` | `#FFA726` | Alertas |
+| `negative` | `#EF5350` | Erros, perdas |
+| `info` | `#42A5F5` | Informações |
+
+### Interface Neutra
+
+| Variável | Hex | Uso |
+|----------|-----|-----|
+| `--color-bg` | `#1A1D29` | Fundo principal |
+| `--color-card` | `#252935` | Cards, modais |
+| `--color-border` | `#3A3F51` | Bordas |
+| `--text-primary` | `#F5F7FA` | Texto principal |
+| `--text-secondary` | `#A0A5B8` | Texto secundário |
+
+### Alternativa
+
+| Variável | Hex | Uso |
+|----------|-----|-----|
+| `--alt-orange-coral` | `#FF7A59` | Variação de laranja |
+| `--alt-green-lime` | `#90EE90` | Variação de verde |
+| `--alt-purple-deep` | `#6B4FBB` | Destaque premium |
+| `--alt-blue-teal` | `#2C7A7B` | Elementos secundários |
+
+### Exemplo de Uso
+
+```scss
+// SCSS
+button.cta {
+  background: $primary;
+  color: $dark;
+  &:hover { background: $accent; }
+}
+
+// CSS Custom Properties
+.card {
+  background: var(--color-card);
+  color: var(--text-primary);
+  border: 1px solid var(--color-border);
+}
+````
+
+Evite usar valores hex direto nos componentes; utilize os tokens para manter consistência e facilitar manutenção.
+
+````
 
 Registre em `src/router/index.ts`:
 
 ```typescript
 router.beforeEach(meuGuard);
-```
+````
 
 ### Usando a Store de Auth
 
@@ -803,10 +864,10 @@ Este projeto está sob a licença [MIT](LICENSE).
 
 <div align="center">
   <p>
-    Feito com ❤️ e ☕ por 
+    Feito com ❤️ e ☕ por
     <a href="https://github.com/AdrianResende">Adrian Resende</a>
   </p>
-  
+
   <p>
     <strong>SmartPicks</strong> - Apostas Inteligentes 🧠⚽
   </p>
