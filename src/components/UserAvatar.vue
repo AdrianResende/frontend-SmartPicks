@@ -3,7 +3,7 @@
     <q-avatar
       :size="size"
       class="user-avatar"
-      :class="{ editable: editable, 'cursor-pointer': editable }"
+      :class="avatarClasses"
       @click.stop="handleAvatarClick"
     >
       <img v-if="avatarUrl" :src="avatarUrl" :alt="altText" @error="handleImageError" />
@@ -80,6 +80,7 @@
 
 <script setup lang="ts">
   import { ref, computed, watch } from 'vue';
+  import { useRouter } from 'vue-router';
   import { useAuthStore } from 'src/stores/auth';
   import { useQuasar } from 'quasar';
 
@@ -96,6 +97,7 @@
 
   const $q = useQuasar();
   const authStore = useAuthStore();
+  const router = useRouter();
 
   const showUploadDialog = ref(false);
   const selectedFile = ref<File | null>(null);
@@ -117,10 +119,18 @@
     return 'sm';
   });
 
-  const handleAvatarClick = () => {
-    console.log('Avatar clicado! Editable:', props.editable);
+  const avatarClasses = computed(() => ({
+    editable: props.editable,
+    'cursor-pointer': props.editable || (!!props.userId && !props.editable),
+  }));
+
+  const handleAvatarClick = async () => {
     if (props.editable) {
       openUploadDialog();
+      return;
+    }
+    if (props.userId) {
+      await router.push({ name: 'perfil', params: { id: props.userId } });
     }
   };
 

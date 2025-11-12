@@ -48,11 +48,19 @@
           class="q-pa-md q-mb-md shadow-2 rounded-xl hover-border bg-white text-dark"
         >
           <div class="row items-center no-wrap q-mb-sm">
-            <q-avatar size="56px" class="q-mr-sm">
-              <img :src="palpite.avatar" style="object-fit: cover" />
-            </q-avatar>
+            <UserAvatar
+              :size="'56px'"
+              :editable="false"
+              :userId="palpite.user_id"
+              class="q-mr-sm"
+            />
             <div>
-              <div class="text-weight-medium">{{ palpite.user }}</div>
+              <div
+                class="text-weight-medium cursor-pointer"
+                @click="goToUserProfile(palpite.user_id)"
+              >
+                {{ palpite.user_name }}
+              </div>
               <div class="text-grey-7 text-caption">{{ tempoDecorrido(palpite.created_at) }}</div>
             </div>
           </div>
@@ -213,7 +221,8 @@
   interface Palpite {
     id: number;
     user_id: number;
-    user: string;
+    user_name: string;
+    user?: string;
     avatar: string;
     titulo: string;
     text: string;
@@ -245,6 +254,10 @@
 
   const goToProfile = async () => {
     await router.push('/perfil');
+  };
+
+  const goToUserProfile = async (userId: number) => {
+    await router.push({ name: 'perfil', params: { id: userId } });
   };
 
   async function openCommentsDialog(palpite: Palpite) {
@@ -305,10 +318,11 @@
       const palpitesBase = list.map((p: Palpite) => ({
         id: p.id,
         user_id: p.user_id,
-        user: p.user ?? 'Usuário',
+        user_name: p.user_name ?? 'Usuário',
+        user: p.user_name ?? p.user ?? 'Usuário',
         avatar: p.avatar ?? 'https://i.pravatar.cc/150?u=' + p.user_id,
         titulo: p.titulo ?? '',
-        text: p.titulo ?? '',
+        text: p.text ?? p.titulo ?? '',
         img_url: p.img_url?.startsWith('http')
           ? p.img_url
           : `${import.meta.env.VITE_API_BASE_URL || ''}${p.img_url}`,
@@ -439,7 +453,6 @@
     } catch (error) {
       console.error('Erro ao copiar link:', error);
 
-      // Fallback para navegadores mais antigos
       try {
         const textArea = document.createElement('textarea');
         textArea.value = palpite.link;

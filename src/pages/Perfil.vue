@@ -1,7 +1,6 @@
 <template>
   <q-page class="profile-page">
     <div class="profile-container">
-      <!-- CARD DO PERFIL -->
       <q-card flat bordered class="profile-card q-mt-lg q-mb-md">
         <div class="profile-banner" :style="{ backgroundColor: randomColor }"></div>
 
@@ -84,10 +83,7 @@
           </div>
         </div>
       </q-card>
-
-      <!-- CARD DAS TABS E CONTEÚDOS -->
       <q-card flat bordered class="tabs-card q-mb-lg">
-        <!-- Tabs -->
         <q-tabs
           v-model="activeTab"
           dense
@@ -110,19 +106,16 @@
 
         <q-separator />
 
-        <!-- Tab Panels -->
         <q-tab-panels v-model="activeTab" animated class="bg-transparent">
-          <!-- ====== TAB PALPITES ====== -->
           <q-tab-panel name="palpites" class="q-pa-none">
             <div class="content-layout">
-              <!-- Estatísticas Laterais -->
               <q-card flat bordered class="statistics-card">
                 <q-card-section>
                   <div class="text-h6 text-weight-bold q-mb-md">Estatísticas</div>
                   <div class="q-gutter-sm">
                     <div class="stat-row">
                       <span class="text-grey-8">Total de Palpites:</span>
-                      <span class="text-weight-bold">312</span>
+                      <span class="text-weight-bold">{{ totalPalpites }}</span>
                     </div>
                     <div class="stat-row">
                       <span class="text-grey-8">Palpites Vencidos:</span>
@@ -148,15 +141,12 @@
                 </q-card-section>
               </q-card>
 
-              <!-- Palpites -->
               <div class="palpites-section">
-                <!-- Carregando -->
                 <q-card v-if="loading" flat bordered class="q-pa-xl text-center">
                   <q-spinner color="primary" size="50px" />
                   <div class="text-grey-7 q-mt-md">Carregando palpites...</div>
                 </q-card>
 
-                <!-- Vazio -->
                 <q-card v-else-if="palpites.length === 0" flat bordered class="empty-state-card">
                   <q-card-section class="text-center q-pa-xl">
                     <q-icon name="dashboard" size="80px" color="grey-5" />
@@ -169,7 +159,6 @@
                   </q-card-section>
                 </q-card>
 
-                <!-- Lista de Palpites -->
                 <q-card
                   v-for="palpite in palpites"
                   :key="palpite.id"
@@ -179,9 +168,16 @@
                 >
                   <q-card-section class="q-pa-md">
                     <div class="row items-center q-mb-sm">
-                      <UserAvatar :size="'40px'" />
+                      <UserAvatar
+                        :size="'40px'"
+                        :editable="false"
+                        :userId="palpite.user?.id || profileUser?.id || 0"
+                      />
                       <div class="q-ml-sm">
-                        <div class="text-weight-bold text-grey-10">
+                        <div
+                          class="text-weight-bold text-grey-10 cursor-pointer"
+                          @click="goToUserProfile(palpite.user?.id || profileUser?.id)"
+                        >
                           {{ palpite.user?.nome || profileUser?.nome || 'Gustavo' }}
                         </div>
                         <div class="text-caption text-grey-7">
@@ -206,7 +202,6 @@
             </div>
           </q-tab-panel>
 
-          <!-- ====== TAB ESTATÍSTICAS ====== -->
           <q-tab-panel name="estatisticas" class="q-pa-md">
             <q-card flat bordered class="statistics-card">
               <q-card-section>
@@ -218,7 +213,6 @@
             </q-card>
           </q-tab-panel>
 
-          <!-- ====== TAB SEGUIDORES ====== -->
           <q-tab-panel name="seguidores" class="q-pa-none">
             <q-card flat bordered class="empty-state-card">
               <q-card-section class="text-center q-pa-xl">
@@ -233,7 +227,6 @@
             </q-card>
           </q-tab-panel>
 
-          <!-- ====== TAB SEGUINDO ====== -->
           <q-tab-panel name="seguindo" class="q-pa-none">
             <q-card flat bordered class="empty-state-card">
               <q-card-section class="text-center q-pa-xl">
@@ -255,14 +248,15 @@
 
 <script setup lang="ts">
   defineOptions({ name: 'PerfilPage' });
-  import { ref, onMounted, computed } from 'vue';
-  import { useRoute } from 'vue-router';
+  import { ref, onMounted, computed, watch } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
   import { useAuthStore } from 'src/stores/auth';
   import { useApi } from 'src/composables/useApi';
   import UserAvatar from 'src/components/UserAvatar.vue';
   import type { Palpite, User } from 'src/types';
 
   const route = useRoute();
+  const router = useRouter();
   const authStore = useAuthStore();
   const { get } = useApi();
 
@@ -271,8 +265,15 @@
   const hoverFollowing = ref(false);
   const randomColor = ref<string>('');
   const profileUser = ref<User | null>(null);
-  const palpites = ref<Palpite[]>([]);
+  interface DisplayPalpite extends Omit<Palpite, 'user'> {
+    user?: { id: number; nome: string; avatar?: string };
+    total_likes?: number;
+    total_dislikes?: number;
+    total_comentarios?: number;
+  }
+  const palpites = ref<DisplayPalpite[]>([]);
   const loading = ref(false);
+  const totalPalpites = ref<number>(0);
 
   const isOwnProfile = computed(() => {
     const profileId = route.params.id;
@@ -288,6 +289,11 @@
   const toggleFollow = () => {
     isFollowing.value = !isFollowing.value;
     hoverFollowing.value = false;
+  };
+
+  const goToUserProfile = async (userId?: number | null) => {
+    if (!userId) return;
+    await router.push({ name: 'perfil', params: { id: userId } });
   };
 
   async function fetchUserProfile() {
@@ -309,6 +315,27 @@
     }
   }
 
+  type ApiPalpite = {
+    id: number;
+    user_id: number;
+    user_name?: string;
+    titulo?: string;
+    img_url?: string;
+    link?: string;
+    created_at: string;
+    updated_at?: string;
+    avatar?: string;
+    total_likes?: number;
+    total_dislikes?: number;
+    total_comentarios?: number;
+  };
+
+  interface ApiPalpitesResponse {
+    palpites: ApiPalpite[];
+    total: number;
+    user_id: number;
+  }
+
   async function fetchPalpites() {
     loading.value = true;
     try {
@@ -316,12 +343,45 @@
       if (!userId) return;
 
       const userIdStr = Array.isArray(userId) ? userId[0] : String(userId);
-      const response = await get<Palpite[]>(`/palpites/${userIdStr}`);
+      const response = await get<ApiPalpitesResponse>(`/users/${userIdStr}/palpites`);
       if (response.success && response.data) {
-        palpites.value = response.data;
+        const apiData = response.data;
+        totalPalpites.value = apiData.total ?? apiData.palpites?.length ?? 0;
+
+        const nome = profileUser.value?.nome;
+        const userIdNum = profileUser.value?.id ?? Number(userIdStr);
+        const avatarDefault = profileUser.value?.avatar;
+
+        palpites.value = (apiData.palpites || []).map((p: ApiPalpite & { user_name?: string }) => {
+          const avatarUrl = p.avatar || avatarDefault;
+          const userName = p.user_name || nome || 'Usuário';
+          const userVal: { id: number; nome: string; avatar?: string } = {
+            id: p.user_id ?? userIdNum,
+            nome: String(userName),
+          };
+          if (avatarUrl) userVal.avatar = avatarUrl;
+
+          const base: DisplayPalpite = {
+            id: p.id,
+            imagem: p.img_url || '',
+            user: userVal,
+            userId: p.user_id,
+            createdAt: p.created_at,
+          };
+          if (p.updated_at) base.updatedAt = p.updated_at;
+          if (p.titulo) base.titulo = p.titulo;
+          if (typeof p.total_likes === 'number') base.total_likes = p.total_likes;
+          if (typeof p.total_dislikes === 'number') base.total_dislikes = p.total_dislikes;
+          if (typeof p.total_comentarios === 'number') base.total_comentarios = p.total_comentarios;
+          return base;
+        });
+      } else {
+        totalPalpites.value = 0;
+        palpites.value = [];
       }
     } catch (error) {
       console.error('Erro ao buscar palpites:', error);
+      totalPalpites.value = 0;
     } finally {
       loading.value = false;
     }
@@ -332,23 +392,28 @@
     await fetchUserProfile();
     await fetchPalpites();
   });
+
+  watch(
+    () => route.params.id,
+    async () => {
+      await fetchUserProfile();
+      await fetchPalpites();
+    }
+  );
 </script>
 <style scoped>
-  /* ======= PÁGINA ======= */
   .profile-page {
     background-color: #b9eaef;
     min-height: 100vh;
     padding: 16px;
   }
 
-  /* ======= CONTAINER PRINCIPAL ======= */
   .profile-container {
     max-width: 1200px;
     margin: 0 auto;
     background: transparent;
   }
 
-  /* ======= CARDS PRINCIPAIS ======= */
   .profile-card,
   .tabs-card {
     border-radius: 16px;
@@ -357,7 +422,6 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
 
-  /* Margens verticais */
   .profile-card {
     margin-top: 24px;
     margin-bottom: 24px;
@@ -367,11 +431,10 @@
     margin-bottom: 40px;
   }
 
-  /* ======= BANNER ======= */
   .profile-banner {
     height: 200px;
     position: relative;
-    border-bottom: 2px solid #000;
+    border-bottom: 1px solid #eff3f4;
   }
 
   .banner-overlay {
@@ -380,7 +443,6 @@
     left: 12px;
   }
 
-  /* ======= CONTEÚDO PRINCIPAL ======= */
   .profile-content {
     background-color: transparent;
     padding: 0 16px 16px;
@@ -389,8 +451,6 @@
   .profile-header-section {
     padding: 0 8px;
   }
-
-  /* ======= AVATAR E AÇÕES ======= */
   .avatar-actions-row {
     display: flex;
     justify-content: space-between;
@@ -426,7 +486,6 @@
     color: #f4212e !important;
   }
 
-  /* ======= INFORMAÇÕES DO PERFIL ======= */
   .profile-info {
     padding-bottom: 16px;
   }
@@ -436,7 +495,6 @@
     font-size: 12px;
   }
 
-  /* ======= ESTATÍSTICAS (TOPO) ======= */
   .stats-row {
     display: flex;
     gap: 32px;
@@ -448,7 +506,6 @@
     align-items: flex-start;
   }
 
-  /* ======= TABS ======= */
   .profile-tabs {
     border-bottom: 1px solid #eff3f4;
     height: 53px;
@@ -466,7 +523,6 @@
     background-color: rgba(15, 20, 25, 0.05);
   }
 
-  /* ======= LAYOUT DE CONTEÚDO (2 colunas) ======= */
   .content-layout {
     display: grid;
     grid-template-columns: 300px 1fr;
@@ -474,7 +530,6 @@
     padding: 16px;
   }
 
-  /* ======= CARD DE ESTATÍSTICAS ======= */
   .statistics-card {
     border-radius: 12px;
     height: fit-content;
@@ -494,7 +549,6 @@
     border-bottom: none;
   }
 
-  /* ======= PALPITES ======= */
   .palpites-section {
     display: flex;
     flex-direction: column;
@@ -515,12 +569,10 @@
     border: 1px solid #eff3f4;
   }
 
-  /* ======= EMPTY STATE ======= */
   .empty-state-card {
     border-radius: 12px;
   }
 
-  /* ======= RESPONSIVIDADE ======= */
   @media (max-width: 768px) {
     .content-layout {
       grid-template-columns: 1fr;

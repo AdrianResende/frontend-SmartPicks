@@ -183,7 +183,7 @@
     try {
       await router.push({ name: 'dashboard' });
     } catch (err) {
-      // ignore navigation errors (e.g., navigating to the same route)
+      console.error('Erro ao navegar para o dashboard:', err);
     }
   };
 
