@@ -541,6 +541,35 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
+  // Busca de palpites por título. Suporta duas formas de endpoint:
+  // 1. /palpites/search/{termo}
+  // 2. /palpites/search?q=termo
+  // Retorna sempre um objeto normalizado: { palpites: Palpite[], total: number, termo: string }
+  const searchPalpites = async (query: string) => {
+    if (!query || !query.trim()) return { palpites: [], total: 0, termo: '' };
+    const termo = query.trim();
+    try {
+      let response;
+      // Primeiro tenta o endpoint por path param
+      try {
+        response = await api.get(`/palpites/search/${encodeURIComponent(termo)}`);
+      } catch {
+        // Fallback para query param se o endpoint acima não existir ou falhar
+        response = await api.get('/palpites/search', { params: { q: termo } });
+      }
+
+      const data = response?.data || {};
+      const palpites = Array.isArray(data.palpites) ? data.palpites : [];
+      const total = typeof data.total === 'number' ? data.total : palpites.length;
+      const termoRetornado = typeof data.termo === 'string' ? data.termo : termo;
+      return { palpites, total, termo: termoRetornado };
+    } catch (error) {
+      console.error('Erro ao buscar palpites por título:', error);
+      toast.error('Erro na busca de palpites');
+      return { palpites: [], total: 0, termo };
+    }
+  };
+
   const reactToPalpite = async (palpiteId: number, tipo: 'like' | 'dislike') => {
     try {
       const response = await api.post(`/palpites/${palpiteId}/react`, {
@@ -693,6 +722,7 @@ export const useAuthStore = defineStore('auth', () => {
     reactToComentario,
     getPalpiteStats,
     getPalpitesWithStats,
+    searchPalpites,
     getComentarios,
     createComentario,
     updateComentario,

@@ -42,6 +42,49 @@
       </div>
 
       <div class="col-12 col-md-6">
+        <div class="q-mb-md">
+          <q-input
+            dense
+            outlined
+            v-model="searchQuery"
+            placeholder="Buscar palpites pelo título..."
+            :loading="searching"
+            clearable
+            @clear="onClearSearch"
+            @keyup.enter="triggerSearch"
+            class="search-input"
+            bg-color="white"
+          >
+            <template #prepend>
+              <q-icon name="search" color="primary" />
+            </template>
+            <template #append>
+              <q-btn
+                round
+                unelevated
+                color="primary"
+                icon="arrow_forward"
+                @click="triggerSearch"
+                :disable="!searchQuery"
+                class="search-btn"
+                size="sm"
+              >
+                <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]">
+                  Buscar
+                </q-tooltip>
+              </q-btn>
+            </template>
+          </q-input>
+        </div>
+        <!-- Resumo da busca -->
+        <div v-if="searchTerm && !searching" class="q-mb-sm text-dark">
+          <div v-if="palpites.length" class="text-caption">
+            {{ searchTotal }} resultado{{ searchTotal === 1 ? '' : 's' }} para "{{ searchTerm }}"
+          </div>
+          <div v-else class="text-caption text-grey-7">
+            Nenhum resultado para "{{ searchTerm }}"
+          </div>
+        </div>
         <q-card
           v-for="palpite in palpites"
           :key="palpite.id"
@@ -65,9 +108,7 @@
             </div>
           </div>
 
-          <div class="text-body1 q-mb-sm">
-            {{ palpite.text }}
-          </div>
+          <div class="text-body1 q-mb-sm" v-html="highlightPalpite(palpite.text)"></div>
           <div class="image-container">
             <q-img
               :src="palpite.img_url"
@@ -213,6 +254,7 @@
   import { useAuthStore } from 'src/stores/auth';
   import { toast } from 'vue3-toastify';
   import UserAvatar from 'src/components/UserAvatar.vue';
+  import { sanitizeHtml } from 'src/utils/sanitization';
   import ReactionButtons from 'src/components/ReactionButtons.vue';
   import { useEventBus } from 'src/composables/useEventBus';
   import { useReactions } from 'src/composables/useReactions';
@@ -251,6 +293,10 @@
   const reactingPalpiteId = ref<number | null>(null);
 
   const palpites = ref<Palpite[]>([]);
+  const allPalpitesBackup = ref<Palpite[]>([]);
+  const searchQuery = ref('');
+  const searching = ref(false);
+  let searchDebounce: number | undefined;
 
   const goToProfile = async () => {
     await router.push('/perfil');
@@ -337,6 +383,7 @@
       }));
 
       palpites.value = palpitesBase;
+      allPalpitesBackup.value = palpitesBase;
 
       for (const palpite of palpites.value) {
         await atualizarStatsPalpite(palpite.id);
@@ -347,6 +394,63 @@
       console.error('❌ Erro ao carregar palpites:', e);
       toast.error('Erro ao carregar palpites.');
     }
+  }
+
+  async function executarBusca() {
+    const q = searchQuery.value.trim();
+    if (!q) {
+      palpites.value = allPalpitesBackup.value;
+      searchTerm.value = '';
+      searchTotal.value = 0;
+      return;
+    }
+    searching.value = true;
+    try {
+      const response = await authStore.searchPalpites(q);
+      const list = Array.isArray(response?.palpites) ? response.palpites : [];
+      palpites.value = list.map((p: Palpite) => ({
+        id: p.id,
+        user_id: p.user_id,
+        user_name: p.user_name ?? 'Usuário',
+        user: p.user_name ?? p.user ?? 'Usuário',
+        avatar: p.avatar ?? 'https://i.pravatar.cc/150?u=' + p.user_id,
+        titulo: p.titulo ?? '',
+        text: p.text ?? p.titulo ?? '',
+        img_url: p.img_url?.startsWith('http')
+          ? p.img_url
+          : `${import.meta.env.VITE_API_BASE_URL || ''}${p.img_url}`,
+        link: p.link ?? '',
+        created_at: p.created_at ?? '',
+        comments: [],
+        newComment: '',
+        total_likes: p.total_likes ?? 0,
+        total_dislikes: p.total_dislikes ?? 0,
+        total_comentarios: p.total_comentarios ?? 0,
+        user_reaction: p.user_reaction ?? null,
+      }));
+      searchTerm.value = response?.termo || q;
+      searchTotal.value =
+        typeof response?.total === 'number' ? response.total : palpites.value.length;
+    } catch (e) {
+      console.error('Erro na busca:', e);
+      toast.error('Falha ao buscar palpites.');
+    } finally {
+      searching.value = false;
+    }
+  }
+
+  function triggerSearch() {
+    clearTimeout(searchDebounce);
+    searchDebounce = window.setTimeout(() => {
+      void executarBusca();
+    }, 300);
+  }
+
+  function onClearSearch() {
+    searchQuery.value = '';
+    palpites.value = allPalpitesBackup.value;
+    searchTerm.value = '';
+    searchTotal.value = 0;
   }
 
   async function atualizarStatsPalpite(palpiteId: number) {
@@ -482,6 +586,22 @@
     { user: '@ZecaBets', precision: '80%' },
   ]);
 
+  // Termo e total retornados pela busca
+  const searchTerm = ref('');
+  const searchTotal = ref(0);
+
+  function escapeRegExp(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function highlightPalpite(text: string): string {
+    const raw = text || '';
+    const safe = sanitizeHtml(raw);
+    if (!searchTerm.value) return safe;
+    const pattern = new RegExp(escapeRegExp(searchTerm.value), 'gi');
+    return safe.replace(pattern, match => `<span class="highlight-match">${match}</span>`);
+  }
+
   onMounted(async () => {
     if (!authStore.isAuthenticated) {
       try {
@@ -509,6 +629,12 @@
 <style scoped>
   .actions-section {
     padding: 4px 0;
+  }
+  .highlight-match {
+    background: #ffeb3b;
+    color: #000;
+    padding: 0 2px;
+    border-radius: 2px;
   }
 
   .comment-action {
@@ -694,3 +820,4 @@
     }
   }
 </style>
+deixe o busca bonito e combinando

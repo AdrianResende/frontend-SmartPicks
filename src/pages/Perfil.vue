@@ -6,7 +6,10 @@
 
         <div class="profile-content q-pa-md">
           <div class="profile-header-section">
-            <div class="avatar-actions-row">
+            <div
+              class="row justify-between items-end q-mb-md avatar-actions-row"
+              style="margin-top: -66px"
+            >
               <div>
                 <UserAvatar :size="'132px'" :editable="false" class="profile-avatar" />
               </div>
@@ -65,16 +68,16 @@
                 />
               </div>
 
-              <div class="stats-row q-mb-md">
-                <div class="stat-item">
+              <div class="row q-gutter-xl q-mb-md">
+                <div class="column">
                   <div class="text-h6 text-weight-bold text-grey-10">79.5%</div>
                   <div class="text-caption text-grey-7">Precisão</div>
                 </div>
-                <div class="stat-item">
+                <div class="column">
                   <div class="text-h6 text-weight-bold text-grey-10">5.1k</div>
                   <div class="text-caption text-grey-7">Seguidores</div>
                 </div>
-                <div class="stat-item">
+                <div class="column">
                   <div class="text-h6 text-weight-bold text-grey-10">200</div>
                   <div class="text-caption text-grey-7">Seguindo</div>
                 </div>
@@ -108,8 +111,8 @@
 
         <q-tab-panels v-model="activeTab" animated class="bg-transparent">
           <q-tab-panel name="palpites" class="q-pa-none">
-            <div class="content-layout">
-              <q-card flat bordered class="statistics-card">
+            <div class="content-layout row q-col-gutter-md">
+              <q-card flat bordered class="statistics-card q-ma-md">
                 <q-card-section>
                   <div class="text-h6 text-weight-bold q-mb-md">Estatísticas</div>
                   <div class="q-gutter-sm">
@@ -164,7 +167,7 @@
                   :key="palpite.id"
                   flat
                   bordered
-                  class="palpite-card q-mb-md"
+                  class="q-mb-md rounded-borders palpite-card"
                 >
                   <q-card-section class="q-pa-md">
                     <div class="row items-center q-mb-sm">

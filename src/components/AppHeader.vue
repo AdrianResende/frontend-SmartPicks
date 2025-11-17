@@ -23,24 +23,6 @@
           </div>
 
           <q-space />
-          <div class="gt-sm q-mx-md" style="max-width: 400px; width: 100%">
-            <q-input
-              dense
-              rounded
-              outlined
-              debounce="300"
-              v-model="searchQuery"
-              placeholder="Buscar..."
-              bg-color="grey-1"
-              class="transition-all"
-            >
-              <template v-slot:prepend>
-                <q-icon name="search" color="primary" />
-              </template>
-            </q-input>
-          </div>
-
-          <q-space />
 
           <div class="row items-center q-gutter-xs">
             <q-btn
