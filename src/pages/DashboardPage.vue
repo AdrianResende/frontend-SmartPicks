@@ -1,8 +1,11 @@
 <template>
-  <q-page class="q-pa-md flex full-height full-width text-white" style="background-color: #b9eaef">
+  <q-page class="q-pa-md flex full-height full-width" style="background-color: #ffffff">
     <div class="row justify-center full-width" style="max-width: 1200px; width: 100%">
       <div class="col-12 col-md-3 q-pr-md q-mb-md">
-        <q-card class="q-pa-md text-center shadow-2 bg-white text-dark sidebar-card">
+        <q-card
+          class="q-pa-md text-center shadow-2 bg-white text-dark sidebar-card"
+          style="border: 1px solid #808080"
+        >
           <div class="text-h6 text-weight-bold q-mb-sm">Seu Perfil</div>
           <UserAvatar :size="'96px'" :editable="true" class="q-mb-sm" @click.stop />
           <div class="text-body1 q-mb-xs cursor-pointer" @click="goToProfile">
@@ -17,7 +20,10 @@
             @click="goToProfile"
           />
         </q-card>
-        <q-card class="q-pa-md q-mt-md shadow-2 bg-white text-dark sidebar-card">
+        <q-card
+          class="q-pa-md q-mt-md shadow-2 bg-white text-dark sidebar-card"
+          style="border: 1px solid #808080"
+        >
           <div class="text-h6 q-mb-sm align-center justify-between row items-center">
             <img
               src="/icons/brasileirao.png"
@@ -33,7 +39,10 @@
           </div>
           <div class="text-caption text-grey-7">Veja os próximos jogos do campeonato.</div>
         </q-card>
-        <q-card class="q-pa-md q-mt-md shadow-2 bg-white text-dark sidebar-card">
+        <q-card
+          class="q-pa-md q-mt-md shadow-2 bg-white text-dark sidebar-card"
+          style="border: 1px solid #808080"
+        >
           <div class="text-h6 q-mb-sm align-center justify-center flex">🏆 Top Apostadores</div>
           <q-separator spaced />
           <q-list dense>
@@ -102,6 +111,7 @@
           v-for="palpite in palpites"
           :key="palpite.id"
           class="q-pa-md q-mb-md shadow-2 rounded-xl hover-border bg-white text-dark"
+          style="border: 1px solid #808080"
         >
           <div class="row items-center no-wrap q-mb-sm">
             <UserAvatar

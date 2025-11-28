@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md" style="background-color: #b9eaef; min-height: 100vh">
+  <q-page class="q-pa-md" style="background-color: #ffffff; min-height: 100vh">
     <div class="row justify-center">
       <div class="col-12 col-md-11">
         <div
@@ -15,7 +15,10 @@
 
         <div v-if="!loading" class="row q-col-gutter-md">
           <div v-for="p in partidas" :key="p.partida_id" class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <q-card class="shadow-4 match-card" style="border-radius: 14px">
+            <q-card
+              class="shadow-4 match-card"
+              style="border-radius: 14px; border: 1px solid #808080"
+            >
               <q-card-section class="q-pa-sm">
                 <div class="row items-center justify-between">
                   <div class="text-center">
