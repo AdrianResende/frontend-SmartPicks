@@ -67,17 +67,16 @@
             clearable
             @clear="onClearSearch"
             @keyup.enter="triggerSearch"
-            class="search-input"
             bg-color="white"
           >
             <template #prepend>
-              <q-icon name="search" color="primary" />
+              <q-icon name="search" color="black" />
             </template>
             <template #append>
               <q-btn
                 round
                 unelevated
-                color="primary"
+                color="black"
                 icon="arrow_forward"
                 @click="triggerSearch"
                 :disable="!searchQuery"
@@ -91,7 +90,6 @@
             </template>
           </q-input>
         </div>
-        <!-- Resumo da busca -->
         <div v-if="searchTerm && !searching" class="q-mb-sm text-dark">
           <div v-if="palpites.length" class="text-caption">
             {{ searchTotal }} resultado{{ searchTotal === 1 ? '' : 's' }} para "{{ searchTerm }}"
