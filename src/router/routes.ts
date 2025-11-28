@@ -47,6 +47,11 @@ const routes: RouteRecordRaw[] = [
         name: 'dashboard',
         component: () => import('pages/DashboardPage.vue'),
       },
+      {
+        path: 'brasileirao',
+        name: 'proximos-jogos',
+        component: () => import('pages/ProximosJogos.vue'),
+      },
     ],
   },
   {

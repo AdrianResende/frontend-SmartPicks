@@ -8,7 +8,6 @@
           <div class="text-body1 q-mb-xs cursor-pointer" @click="goToProfile">
             {{ authStore.user?.nome || 'Usuário' }}
           </div>
-          <div class="text-grey-7 text-caption">2 Apostas • 90% Precisão</div>
           <q-btn
             flat
             dense
@@ -17,6 +16,22 @@
             class="q-mt-sm"
             @click="goToProfile"
           />
+        </q-card>
+        <q-card class="q-pa-md q-mt-md shadow-2 bg-white text-dark sidebar-card">
+          <div class="text-h6 q-mb-sm align-center justify-between row items-center">
+            <img
+              src="/icons/brasileirao.png"
+              alt="Brasileirão Logo"
+              style="height: 48px; width: auto"
+            />
+            <span>Brasileirão Série A</span>
+            <q-btn dense flat color="primary" icon="sports_soccer" @click="goToBrasileirao">
+              <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]"
+                >Ver próximos jogos</q-tooltip
+              >
+            </q-btn>
+          </div>
+          <div class="text-caption text-grey-7">Veja os próximos jogos do campeonato.</div>
         </q-card>
         <q-card class="q-pa-md q-mt-md shadow-2 bg-white text-dark sidebar-card">
           <div class="text-h6 q-mb-sm align-center justify-center flex">🏆 Top Apostadores</div>
@@ -586,6 +601,10 @@
     { user: '@ZecaBets', precision: '80%' },
   ]);
 
+  function goToBrasileirao() {
+    void router.push('/dashboard/brasileirao');
+  }
+
   // Termo e total retornados pela busca
   const searchTerm = ref('');
   const searchTotal = ref(0);
@@ -820,4 +839,3 @@
     }
   }
 </style>
-deixe o busca bonito e combinando

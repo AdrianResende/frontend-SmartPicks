@@ -26,6 +26,16 @@
 
           <div class="row items-center q-gutter-xs">
             <q-btn
+              class="gt-xs q-mx-sm"
+              flat
+              rounded
+              color="primary"
+              icon="sports_soccer"
+              label="Brasileirão"
+              no-caps
+              @click="goToBrasileirao"
+            />
+            <q-btn
               class="lt-md"
               flat
               round
@@ -166,6 +176,14 @@
       await router.push({ name: 'dashboard' });
     } catch (err) {
       console.error('Erro ao navegar para o dashboard:', err);
+    }
+  };
+
+  const goToBrasileirao = async () => {
+    try {
+      await router.push('/dashboard/brasileirao');
+    } catch (err) {
+      console.error('Erro ao navegar para Brasileirão:', err);
     }
   };
 
